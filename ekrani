@@ -1,0 +1,18 @@
+Screens:
+/onboarding (carousel ko od team up)
+/login
+/register
+/forgotPassword
+? /passwordChanged
+/home + filter (+ results)
+/carDetail (+ /carLocation -> nosi na mapa kaj sto pinche i user location)
+/searchByDate (DateTimeRange sto prebaruva dali se preklopuva so listata na unavailable dates na kolite, i dokolku ne - ja prikazuva kolata)
+/checkout
+/bookingConfirmed
+/myBookings (user's bookings)
+
+Model:
+Car:
+location (random assigned pri dodavanje vo baza)
+lista na DateTimeRange unavailable (sekoj pat koga korisnikot ke plati za kolata, se dodava na listata)
+
