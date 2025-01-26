@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../../widgets/radio_button.dart';
+
 class CheckoutScreen extends StatefulWidget {
   const CheckoutScreen({super.key});
 
@@ -8,94 +10,58 @@ class CheckoutScreen extends StatefulWidget {
 }
 
 class _CheckoutScreenState extends State<CheckoutScreen> {
-  String? _paymentMethod = 'credit_card'; // Default selected payment method
-  final _cardNumberController = TextEditingController();
-  final _expiryDateController = TextEditingController();
-  final _cvvController = TextEditingController();
+  PaymentMethod? _paymentMethod = PaymentMethod.card;
 
   @override
   Widget build(BuildContext context) {
-    final car = ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>;
-
     return Scaffold(
-      appBar: AppBar(title: const Text("Checkout")),
+      appBar: AppBar(
+        title: const Text('Checkout'),
+        backgroundColor: Colors.white,
+      ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              "Payment for ${car['brand']} ${car['model']}",
-              style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 20),
-            const Text(
-              "Select Payment Method:",
-              style: TextStyle(fontWeight: FontWeight.bold),
-            ),
-            ListTile(
-              title: const Text("Credit Card"),
-              leading: Radio<String>(
-                value: 'credit_card',
-                groupValue: _paymentMethod,
-                onChanged: (value) {
-                  setState(() {
-                    _paymentMethod = value;
-                  });
-                },
-              ),
-            ),
-            if (_paymentMethod == 'credit_card') ...[
-              TextField(
-                controller: _cardNumberController,
-                decoration: const InputDecoration(labelText: "Card Number"),
-                keyboardType: TextInputType.number,
-              ),
-              TextField(
-                controller: _expiryDateController,
-                decoration:
-                    const InputDecoration(labelText: "Expiry Date (MM/YY)"),
-              ),
-              TextField(
-                controller: _cvvController,
-                decoration: const InputDecoration(labelText: "CVV"),
-                keyboardType: TextInputType.number,
-                obscureText: true,
-              ),
-            ],
-            ListTile(
-              title: const Text("Cash on Pickup"),
-              leading: Radio<String>(
-                value: 'cash',
-                groupValue: _paymentMethod,
-                onChanged: (value) {
-                  setState(() {
-                    _paymentMethod = value;
-                  });
-                },
-              ),
-            ),
-            const SizedBox(height: 20),
-            ElevatedButton(
-              onPressed: () {
-                if (_paymentMethod == 'credit_card') {
-                  if (_cardNumberController.text.isEmpty ||
-                      _expiryDateController.text.isEmpty ||
-                      _cvvController.text.isEmpty) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                          content: Text("Please fill out all card details.")),
-                    );
-                    return;
-                  }
-                }
-
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text("Booking Confirmed!")),
-                );
-                Navigator.pushReplacementNamed(context, '/bookingConfirmed');
+            PaymentOptionRadio(
+              title: 'Debit/Credit Card',
+              value: PaymentMethod.card,
+              groupValue: _paymentMethod,
+              onChanged: (PaymentMethod? value) {
+                setState(() {
+                  _paymentMethod = value;
+                });
               },
-              child: const Text("Confirm Payment"),
+            ),
+            PaymentOptionRadio(
+              title: 'Cash on Delivery',
+              value: PaymentMethod.cash,
+              groupValue: _paymentMethod,
+              onChanged: (PaymentMethod? value) {
+                setState(() {
+                  _paymentMethod = value;
+                });
+              },
+            ),
+            const SizedBox(height: 40),
+            Center(
+              child: ElevatedButton(
+                onPressed: () {
+                  showDialog(
+                      context: context,
+                      builder: (context) => const BookingConfirmedDialog(),
+                  );
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.purple,
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 50, vertical: 20),
+                  textStyle: const TextStyle(fontSize: 18),
+                ),
+                child: const Text('Pay Now',
+                    style: TextStyle(color: Colors.white)),
+              ),
             ),
           ],
         ),
@@ -103,3 +69,60 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
     );
   }
 }
+
+class BookingConfirmedDialog extends StatelessWidget {
+  const BookingConfirmedDialog({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(16),
+      ),
+      contentPadding: const EdgeInsets.all(20),
+      content: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          RichText(
+            textAlign: TextAlign.center,
+            text: const TextSpan(
+              text: 'Your booking is',
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+                color: Colors.black,
+              ),
+              children: [
+                TextSpan(
+                  text: ' Confirmed!',
+                  style: TextStyle(
+                    color: Colors.purple,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 20),
+          ElevatedButton(
+            onPressed: () {
+              Navigator.popAndPushNamed(context, '/myBookings');
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.purple,
+              padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 12),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8),
+              ),
+            ),
+            child: const Text(
+              'My bookings',
+              style: TextStyle(color: Colors.white),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+

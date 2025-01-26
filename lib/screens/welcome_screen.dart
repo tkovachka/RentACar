@@ -6,47 +6,33 @@ class WelcomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        crossAxisAlignment: CrossAxisAlignment.center,
+      body: Stack(
         children: [
-          // Image above the title
-          Image.asset(
-            'assets/images/logo.jpg', // Replace with your actual image path
-            height: 200, // Set a fixed height for the image
-            fit: BoxFit.cover,
-          ),
-          const SizedBox(height: 40),
-          // App Title
-          Text(
-            'RentACar',
-            style: TextStyle(
-              fontSize: 36,
-              fontWeight: FontWeight.bold,
-              color: Colors.deepPurple,
-              shadows: [
-                Shadow(
-                  offset: const Offset(2, 2),
-                  blurRadius: 6,
-                  color: Colors.black.withOpacity(0.5),
+          Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Image.asset(
+                  'assets/images/logo.png',
+                  fit: BoxFit.cover,
                 ),
+                const SizedBox(height: 40),
               ],
             ),
           ),
-          const SizedBox(height: 40),
-          // Navigation Icon
-          GestureDetector(
-            onTap: () => Navigator.pushReplacementNamed(context, '/onBoarding'),
-            child: Container(
-              padding: const EdgeInsets.all(16.0),
-              decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.7),
-                shape: BoxShape.circle,
-              ),
-              child: const Icon(
-                Icons.arrow_forward,
-                size: 32,
-                color: Colors.deepPurple,
+          Positioned(
+            bottom: 16,
+            right: 16,
+            child: GestureDetector(
+              onTap: () => Navigator.pushReplacementNamed(context, '/onBoarding'),
+              child: Container(
+                padding: const EdgeInsets.all(8.0),
+                child: const Icon(
+                  Icons.arrow_forward,
+                  size: 24,
+                  color: Colors.deepPurple,
+                ),
               ),
             ),
           ),

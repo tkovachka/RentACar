@@ -2,12 +2,14 @@ import 'package:flutter/material.dart';
 
 class FilterButton extends StatelessWidget {
   final String label;
+  final IconData icon;
   final bool isSelected;
   final VoidCallback onTap;
 
   const FilterButton({
     super.key,
     required this.label,
+    required this.icon,
     required this.isSelected,
     required this.onTap,
   });
@@ -17,13 +19,37 @@ class FilterButton extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        width: 80,  // Adjust width to make it a square
+        height: 80,  // Adjust height to make it a square
         decoration: BoxDecoration(
-          color: isSelected ? Colors.blue : Colors.grey[300],
-          borderRadius: BorderRadius.circular(20),
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(8), // Rounded corners
+          border: Border.all(
+            color: isSelected ? Colors.purple : Colors.grey.shade100, // Border color based on selection
+            width: 2,
+          ),
         ),
-        child: Text(label,
-            style: TextStyle(color: isSelected ? Colors.white : Colors.black)),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Icon(
+              icon,
+              color: isSelected ? Colors.purple : Colors.black, // Icon color based on selection
+              size: 28,
+            ),
+            const SizedBox(height: 8), // Space between icon and label
+            Text(
+              label,
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                color: isSelected ? Colors.purple : Colors.black, // Text color based on selection
+                fontSize: 12,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

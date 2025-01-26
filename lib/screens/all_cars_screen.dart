@@ -1,15 +1,13 @@
 import 'package:flutter/material.dart';
-
+import 'package:proekt/widgets/car_card.dart';
 import '../models/car.dart';
-import '../widgets/car_card.dart';
 
-class MyBookingsScreen extends StatelessWidget {
-  const MyBookingsScreen({super.key});
+class AllCarsScreen extends StatelessWidget {
+  //todo implement filtering logic
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text("My Bookings")),
       body: SafeArea(
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -28,13 +26,16 @@ class MyBookingsScreen extends StatelessWidget {
             ),
             const SizedBox(height: 16),
             Expanded(
-              child: CarCard(car: car),
+              child: ListView(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                children: mockCars.map((car) => CarCard(car: car)).toList(),
+              ),
             ),
           ],
         ),
       ),
       bottomNavigationBar: BottomNavigationBar(
-        currentIndex: 1,
+        currentIndex: 0,
         onTap: (index) {
           if (index == 0) {
             Navigator.popAndPushNamed(context, '/home');
@@ -64,17 +65,44 @@ class MyBookingsScreen extends StatelessWidget {
     );
   }
 }
-
-final Car car = Car(
-  id: '1',
-  brand: 'Toyota',
-  model: 'Corolla',
-  type: 'Economy',
-  capacity: 4,
-  imagePath: 'assets/images/car.png',
-  location: 'Skopje City Center',
-  characteristics: ['Fuel-efficient', 'Compact size'],
-  unavailableDates: [],
-  pricePerDay: 400,
-  rating: 4.5,
-);
+final List<Car> mockCars = [
+  Car(
+    id: '1',
+    brand: 'Toyota',
+    model: 'Corolla',
+    type: 'Economy',
+    capacity: 4,
+    imagePath: 'assets/images/car.png',
+    location: 'Skopje City Center',
+    characteristics: ['Fuel-efficient', 'Compact size'],
+    unavailableDates: [],
+    pricePerDay: 400,
+    rating: 4.5,
+  ),
+  Car(
+    id: '2',
+    brand: 'Ford',
+    model: 'Escape',
+    type: 'SUV',
+    capacity: 6,
+    imagePath: 'assets/images/car.png',
+    location: 'Skopje East',
+    characteristics: ['Spacious', 'Four-wheel drive'],
+    unavailableDates: [],
+    pricePerDay: 200,
+    rating: 4.3,
+  ),
+  Car(
+    id: '3',
+    brand: 'Mercedes-Benz',
+    model: 'S-Class',
+    type: 'Luxury',
+    capacity: 4,
+    imagePath: 'assets/images/car.png',
+    location: 'Skopje West',
+    characteristics: ['Luxury interior', 'Advanced safety features'],
+    unavailableDates: [],
+    pricePerDay: 350,
+    rating: 4.9,
+  ),
+];
