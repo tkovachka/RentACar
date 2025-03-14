@@ -3,6 +3,7 @@ import 'package:rent_a_car/services/auth_service.dart';
 
 import '../../widgets/buttons/filter_button.dart';
 
+//todo maybe? suggestions on account safety/requirements for renting cars: 1. verify email, 2. upload profile picture
 class MyAccountScreen extends StatelessWidget {
   MyAccountScreen({super.key});
 

@@ -18,18 +18,20 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   final List<Map<String, String>> onboardingData = [
     {
       'title': "Locate the Car",
-      'description': "Your car is at your fingertips. Open the app & find the perfect car according to your needs.",
-      'imagePath': "assets/images/on_boarding.png",
+      'description':
+          "Your car is at your fingertips. Open the app & find the perfect car according to your needs.",
+      'imagePath': "assets/images/on_boarding_1.png",
     },
     {
       'title': "Choose the Date",
-      'description': "Available dates are shown directly in your calendar. Choose the date as easy as 1-2-3.",
-      'imagePath': "assets/images/car.png",
+      'description':
+          "Available dates are shown directly in your calendar. Choose the date as easy as 1-2-3.",
+      'imagePath': "assets/images/on_boarding_2.png",
     },
     {
       'title': "Enjoy Your Ride",
       'description': "Explore and enjoy your trip with ease.",
-      'imagePath': "assets/images/on_boarding.png",
+      'imagePath': "assets/images/on_boarding_3.png",
     },
   ];
 
@@ -39,6 +41,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     });
   }
 
+  //todo check if there is a way to carousel the car images as well
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -46,11 +49,9 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
         children: [
           Positioned.fill(
             top: MediaQuery.of(context).size.height * 0.35,
-            //todo get image from firestore, and load from network image
             child: Image.asset(
               onboardingData[_currentPage]['imagePath']!,
               fit: BoxFit.cover,
-              width: double.infinity,
             ),
           ),
           Column(
@@ -66,7 +67,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                       final data = onboardingData[index];
                       return Padding(
                         padding: const EdgeInsets.symmetric(
-                            horizontal: 16.0, vertical: 50.0),
+                            horizontal: 16.0, vertical: 60.0),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
@@ -78,21 +79,20 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                               itemCount: onboardingData.length,
                               currentIndex: _currentPage,
                             ),
-                            CustomButton(
-                              onPressed: () {
-                                if (_currentPage < onboardingData.length - 1) {
-                                  _pageController.nextPage(
-                                    duration: const Duration(milliseconds: 300),
-                                    curve: Curves.ease,
-                                  );
-                                } else {
-                                  Navigator.pushReplacementNamed(
-                                      context, '/login');
-                                }
-                              },
-                              color: Colors.purple.shade300,
-                              icon: Icons.arrow_forward_ios,
-                            ),
+                            if (_currentPage == onboardingData.length - 1)
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.end,
+                                children: [
+                                  CustomButton(
+                                    onPressed: () {
+                                      Navigator.pushReplacementNamed(
+                                          context, '/login');
+                                    },
+                                    color: Colors.purple.shade300,
+                                    icon: Icons.arrow_forward,
+                                  ),
+                                ],
+                              ),
                           ],
                         ),
                       );

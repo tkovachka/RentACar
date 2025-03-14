@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:rent_a_car/widgets/text/custom_text.dart';
 
 class WelcomeScreen extends StatelessWidget {
   const WelcomeScreen({super.key});
@@ -6,37 +7,37 @@ class WelcomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Stack(
-        children: [
-          Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                Image.asset(
-                  'assets/images/logo.png',
-                  fit: BoxFit.cover,
-                ),
-                const SizedBox(height: 40),
-              ],
+      body: GestureDetector(
+        onTap: () => Navigator.pushReplacementNamed(context, '/onBoarding'),
+        child: Stack(
+          children: [
+            Positioned.fill(
+              child: Image.asset(
+                'assets/images/logo.png',
+                fit: BoxFit.cover,
+              ),
             ),
-          ),
-          Positioned(
-            bottom: 16,
-            right: 16,
-            child: GestureDetector(
-              onTap: () => Navigator.pushReplacementNamed(context, '/onBoarding'),
-              child: Container(
-                padding: const EdgeInsets.all(8.0),
-                child: const Icon(
-                  Icons.arrow_forward,
-                  size: 24,
-                  color: Colors.deepPurple,
+            Positioned.fill(
+              child: Image.asset(
+                'assets/images/welcome-white.png',
+                fit: BoxFit.contain,
+              ),
+            ),
+            const Align(
+              alignment: Alignment(0.0, 0.2), // Adjust this for positioning below center
+              child: Text(
+                "Rent A Car",
+                style: TextStyle(
+                  fontSize: 36, // Adjust font size
+                  fontWeight: FontWeight.bold,
+                  color: Colors.deepPurple, // Darker purple
+                  letterSpacing: 2,
+                  decoration: TextDecoration.none,
                 ),
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

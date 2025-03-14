@@ -37,7 +37,7 @@ class MyApp extends StatelessWidget {
       routes: {
         '/onBoarding': (context) => const OnboardingScreen(), //done
         '/login': (context) => const LoginScreen(), //done
-        '/register': (context) => const RegisterScreen(),
+        '/register': (context) => const RegisterStepOne(), //done
         '/forgotPassword': (context) => ForgotPasswordScreen(),
         '/passwordChanged': (context) => const PasswordChangedScreen(),
         '/myAccount': (context) => MyAccountScreen(),

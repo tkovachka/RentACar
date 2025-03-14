@@ -45,6 +45,7 @@ class _LoginScreenState extends State<LoginScreen> {
         Navigator.pushReplacementNamed(context, '/home');
       }
     }
+    //todo show errors on screen
   }
 
   @override
@@ -82,6 +83,16 @@ class _LoginScreenState extends State<LoginScreen> {
                   controller: _emailController,
                   hintText: "Email",
                   icon: Icons.email,
+                  validator: (value) {
+                    if (value != null) {
+                      final bool emailValid = RegExp(
+                              r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+")
+                          .hasMatch(value);
+                      if (emailValid) return null;
+                      return "Please enter a valid email";
+                    }
+                    return "Please enter an email address";
+                  },
                 ),
                 const SizedBox(height: 16),
                 CustomTextField(
@@ -89,6 +100,10 @@ class _LoginScreenState extends State<LoginScreen> {
                   hintText: "Password",
                   icon: Icons.lock,
                   isPassword: true,
+                  validator: (value) {
+                    if (value != null) return null;
+                    return "Please enter your password";
+                  },
                 ),
                 const SizedBox(height: 8),
                 Align(
@@ -101,6 +116,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 ),
                 const SizedBox(height: 24),
                 CustomButton(
+                  //todo make this bigger
                   text: "Log In",
                   onPressed: () =>
                       _login(_emailController.text, _passwordController.text),
@@ -122,6 +138,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 const DividerWithText("Or sign in with"),
                 const SizedBox(height: 16),
                 Row(
+                  //todo make the buttons the same size
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     SocialLoginButton(
@@ -129,15 +146,14 @@ class _LoginScreenState extends State<LoginScreen> {
                         //todo fix this icon
                         icon: Icons.g_mobiledata_rounded,
                         iconColor: Colors.black,
-                        //todo implement google auth
+                        //todo implement google auth + picking username and profilePicture
                         onPressed: () {}),
                     const SizedBox(width: 16),
                     SocialLoginButton(
                         text: "Facebook",
                         icon: Icons.facebook_rounded,
                         iconColor: Colors.blue.shade900,
-                        onPressed: (){}
-                    ),
+                        onPressed: () {}),
                   ],
                 ),
               ],

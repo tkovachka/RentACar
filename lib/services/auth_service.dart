@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -8,41 +10,38 @@ class AuthService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
   Future<String?> registerUser({
-    required String username,
     required String email,
     required String password,
-    required String confirmPassword,
-    required String profilePictureUrl,
+    required String username,
+    File? profilePicture,
   }) async {
-    if (password != confirmPassword) {
-      return "Passwords do not match.";
-    }
-
     try {
       UserCredential userCredential =
-          await _auth.createUserWithEmailAndPassword(
+      await _auth.createUserWithEmailAndPassword(
         email: email,
         password: password,
       );
 
       await userCredential.user?.sendEmailVerification();
 
+      //basic creation with email only
       await _firestore
           .collection('app_users')
           .doc(userCredential.user?.uid)
           .set({
-        'username': username,
         'email': email,
-        'profilePictureUrl': profilePictureUrl,
+        'username': username,
+        'profilePicture':profilePicture,
         'createdAt': Timestamp.now(),
       });
 
-      return null; // Success
+      return null;
     } on FirebaseAuthException catch (e) {
       return e.message;
     }
   }
 
+  //todo maybe implement logging in with username as well?
   Future<String?> loginUser(
       {required String email, required String password}) async {
     try {
@@ -51,6 +50,7 @@ class AuthService {
         password: password,
       );
 
+      //todo make this not necessary, user should be able to verify address from myAccount page
       if (!(userCredential.user?.emailVerified ?? false)) {
         return "Please verify your email first.";
       }
@@ -61,14 +61,19 @@ class AuthService {
     }
   }
 
-  Future<void> logout() async {
-    await _auth.signOut();
+  Future<String?> logout() async {
+    try {
+      await _auth.signOut();
+      return null;
+    } on FirebaseAuthException catch (e) {
+      return e.message;
+    }
   }
 
   Future<String?> sendPasswordResetEmail(String email) async {
     try {
       await _auth.sendPasswordResetEmail(email: email);
-      return null; // Success
+      return null;
     } on FirebaseAuthException catch (e) {
       return e.message;
     }

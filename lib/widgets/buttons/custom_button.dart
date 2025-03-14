@@ -6,6 +6,7 @@ class CustomButton extends StatelessWidget {
   final VoidCallback onPressed;
   final Color? color;
   final Color? textColor;
+  final bool max;
 
   const CustomButton({
     super.key,
@@ -14,6 +15,7 @@ class CustomButton extends StatelessWidget {
     required this.onPressed,
     this.color,
     this.textColor,
+    this.max = false,
   });
 
   @override
@@ -28,7 +30,7 @@ class CustomButton extends StatelessWidget {
         padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 24),
       ),
       child: Row(
-        mainAxisSize: MainAxisSize.min,
+        mainAxisSize: max ? MainAxisSize.max : MainAxisSize.min,
         children: [
           if (text != null)
             Text(
