@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart'; // For formatting the date
 import 'package:table_calendar/table_calendar.dart'; // Import table_calendar package
-import 'package:proekt/models/booking.dart'; // Ensure this is the correct path to your Booking model
-import 'package:proekt/models/car.dart'; // Your Car model path
+import 'package:rent_a_car/models/booking.dart'; // Ensure this is the correct path to your Booking model
+import 'package:rent_a_car/models/car.dart'; // Your Car model path
 
 class SelectDateScreen extends StatefulWidget {
   final Car car;

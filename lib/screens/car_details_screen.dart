@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:proekt/models/car.dart';
-import 'package:proekt/widgets/filter_button.dart';
-import 'package:proekt/screens/checkout/select_date_screen.dart';
+import 'package:rent_a_car/models/car.dart';
+import 'package:rent_a_car/widgets/buttons/filter_button.dart';
+import 'package:rent_a_car/screens/checkout/select_date_screen.dart';
 
 class CarDetailsScreen extends StatelessWidget {
   final Car car;

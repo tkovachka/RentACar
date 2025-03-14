@@ -1,8 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:rent_a_car/services/auth_service.dart';
 
-import '../../widgets/filter_button.dart';
+import '../../widgets/buttons/filter_button.dart';
 
 class MyAccountScreen extends StatelessWidget {
+  MyAccountScreen({super.key});
+
+  final _authService = AuthService();
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -72,19 +77,22 @@ class MyAccountScreen extends StatelessWidget {
             // Logout Option
             Row(
               children: [
-                const Icon(Icons.logout, color: Colors.purple),
-                ElevatedButton(
-                  onPressed: () => Navigator.popAndPushNamed(context, '/login'),
-                    child: const Text(
-                      'Logout',
-                      style: TextStyle(
-                        color: Colors.purple,
-                        fontSize: 14,
-                      ),
-                    ),
-                )
+                IconButton(
+                  icon: const Icon(Icons.logout, color: Colors.purple),
+                  onPressed: () async {
+                    await _authService.logout();
+                    Navigator.pushReplacementNamed(context, '/login');
+                  },
+                ),
+                const SizedBox(),
+                IconButton(
+                  icon: const Icon(Icons.edit, color: Colors.purple),
+                  onPressed: () {
+                    Navigator.pushNamed(context, '/updateAccount');
+                  },
+                ),
               ],
-            ),
+            )
           ],
         ),
       ),

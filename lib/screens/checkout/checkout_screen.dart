@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../widgets/radio_button.dart';
+import '../../widgets/buttons/radio_button.dart';
 
 class CheckoutScreen extends StatefulWidget {
   const CheckoutScreen({super.key});

@@ -1,7 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:proekt/widgets/car_card.dart';
-import 'package:proekt/widgets/filter_button.dart';
+import 'package:rent_a_car/widgets/cards/car_card.dart';
+import 'package:rent_a_car/widgets/buttons/filter_button.dart';
 
 import '../models/car.dart';
 

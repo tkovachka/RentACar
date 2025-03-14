@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../models/car.dart';
-import '../widgets/car_card.dart';
+import '../widgets/cards/car_card.dart';
 
 class MyBookingsScreen extends StatelessWidget {
   const MyBookingsScreen({super.key});

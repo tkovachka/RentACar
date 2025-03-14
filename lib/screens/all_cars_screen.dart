@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:proekt/widgets/car_card.dart';
+import 'package:rent_a_car/widgets/cards/car_card.dart';
 import '../models/car.dart';
 
 class AllCarsScreen extends StatelessWidget {

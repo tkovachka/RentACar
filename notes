@@ -1,0 +1,17 @@
+optimizing images:
+Use Cloud Functions for Resizing Images
+
+Upload a single high-quality image.
+Use Firebase Cloud Functions with ImageMagick or Sharp to generate different sizes (mdpi, hdpi, xhdpi, etc.).
+Use Firebase Storage URLs in Firestore
+
+Instead of storing images in Firestore directly, store the URL in Firestore and fetch images dynamically.
+Use WebP Instead of PNG/JPEG
+
+WebP offers better compression and quality.
+Lazy Load Images
+
+Use cached_network_image to load images efficiently.
+Optimize Network Calls
+
+Use Firebase Storage rules to cache images and prevent multiple downloads.

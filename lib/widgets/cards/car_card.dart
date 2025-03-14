@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:proekt/models/car.dart';
+import 'package:rent_a_car/models/car.dart';
 
-import '../screens/car_details_screen.dart'; // Ensure this is the path to your Car model file.
+import '../../screens/car_details_screen.dart'; // Ensure this is the path to your Car model file.
 
 class CarCard extends StatefulWidget {
   final Car car;
