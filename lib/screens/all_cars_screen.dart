@@ -1,15 +1,39 @@
 import 'package:flutter/material.dart';
 import 'package:rent_a_car/widgets/cards/car_card.dart';
-import '../models/car.dart';
+import 'package:rent_a_car/models/car.dart';
+import 'package:rent_a_car/services/car_service.dart';
 
-class AllCarsScreen extends StatelessWidget {
+class AllCarsScreen extends StatefulWidget {
   //todo implement filtering logic
+  _AllCarsScreenState createState() => _AllCarsScreenState();
+}
+
+class _AllCarsScreenState extends State<AllCarsScreen> {
+  final CarService _carService = CarService();
+  List<Car> _cars = [];
+  bool _isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadCars();
+  }
+
+  Future<void> _loadCars() async {
+    final fetchedCars = await _carService.getAllCars();
+    setState(() {
+      _cars = fetchedCars;
+      _isLoading = false;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: SafeArea(
-        child: Column(
+        child: _isLoading
+          ? const Center(child: CircularProgressIndicator())
+        : Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -26,9 +50,12 @@ class AllCarsScreen extends StatelessWidget {
             ),
             const SizedBox(height: 16),
             Expanded(
-              child: ListView(
+              child: ListView.builder(
                 padding: const EdgeInsets.symmetric(horizontal: 16),
-                children: mockCars.map((car) => CarCard(car: car)).toList(),
+                itemCount: _cars.length,
+                itemBuilder: (context, index){
+                  return CarCard(car: _cars[index]);
+                }
               ),
             ),
           ],
@@ -65,44 +92,3 @@ class AllCarsScreen extends StatelessWidget {
     );
   }
 }
-final List<Car> mockCars = [
-  Car(
-    id: '1',
-    brand: 'Toyota',
-    model: 'Corolla',
-    type: 'Economy',
-    capacity: 4,
-    imagePath: 'assets/images/car.png',
-    location: 'Skopje City Center',
-    characteristics: ['Fuel-efficient', 'Compact size'],
-    unavailableDates: [],
-    pricePerDay: 400,
-    rating: 4.5,
-  ),
-  Car(
-    id: '2',
-    brand: 'Ford',
-    model: 'Escape',
-    type: 'SUV',
-    capacity: 6,
-    imagePath: 'assets/images/car.png',
-    location: 'Skopje East',
-    characteristics: ['Spacious', 'Four-wheel drive'],
-    unavailableDates: [],
-    pricePerDay: 200,
-    rating: 4.3,
-  ),
-  Car(
-    id: '3',
-    brand: 'Mercedes-Benz',
-    model: 'S-Class',
-    type: 'Luxury',
-    capacity: 4,
-    imagePath: 'assets/images/car.png',
-    location: 'Skopje West',
-    characteristics: ['Luxury interior', 'Advanced safety features'],
-    unavailableDates: [],
-    pricePerDay: 350,
-    rating: 4.9,
-  ),
-];

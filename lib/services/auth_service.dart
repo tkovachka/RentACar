@@ -1,13 +1,20 @@
 import 'dart:io';
+import 'dart:typed_data';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/material.dart';
-import 'package:fluttertoast/fluttertoast.dart';
+import 'package:firebase_storage/firebase_storage.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:path/path.dart' as path;
+import 'package:flutter_image_compress/flutter_image_compress.dart';
+
+import 'images_service.dart';
+
 
 class AuthService {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  final FirebaseStorage _storage = FirebaseStorage.instance;
 
   Future<String?> registerUser({
     required String email,
@@ -17,21 +24,35 @@ class AuthService {
   }) async {
     try {
       UserCredential userCredential =
-      await _auth.createUserWithEmailAndPassword(
+          await _auth.createUserWithEmailAndPassword(
         email: email,
         password: password,
       );
 
-      await userCredential.user?.sendEmailVerification();
+      String? profilePictureUrl;
 
-      //basic creation with email only
+      if (profilePicture != null) {
+        Uint8List compressedImage = await ImageService.compressImage(profilePicture);
+
+        String fileName = ImageService.generateFileName();
+        Reference storageRef =
+            _storage.ref().child('profile_pictures/$fileName)');
+
+        UploadTask uploadTask = storageRef.putData(
+          compressedImage,
+          SettableMetadata(contentType: 'image/webp'),
+        );
+        TaskSnapshot snapshot = await uploadTask;
+        profilePictureUrl = await snapshot.ref.getDownloadURL();
+      }
+
       await _firestore
           .collection('app_users')
           .doc(userCredential.user?.uid)
           .set({
         'email': email,
         'username': username,
-        'profilePicture':profilePicture,
+        'profilePicture': profilePictureUrl,
         'createdAt': Timestamp.now(),
       });
 
@@ -45,16 +66,10 @@ class AuthService {
   Future<String?> loginUser(
       {required String email, required String password}) async {
     try {
-      UserCredential userCredential = await _auth.signInWithEmailAndPassword(
+      await _auth.signInWithEmailAndPassword(
         email: email,
         password: password,
       );
-
-      //todo make this not necessary, user should be able to verify address from myAccount page
-      if (!(userCredential.user?.emailVerified ?? false)) {
-        return "Please verify your email first.";
-      }
-
       return null;
     } on FirebaseAuthException catch (e) {
       return e.message;

@@ -39,8 +39,9 @@ class SubtitleText extends StatelessWidget {
 class NormalText extends StatelessWidget {
   final String text;
   final double? size;
+  final bool? bold;
 
-  const NormalText({super.key, required this.text, this.size});
+  const NormalText({super.key, required this.text, this.size, this.bold});
 
   @override
   Widget build(BuildContext context) {
@@ -49,6 +50,7 @@ class NormalText extends StatelessWidget {
       style: TextStyle(
         fontSize: size ?? 18,
         color: Colors.black,
+        fontWeight: bold==true ? FontWeight.bold : null,
       ),
       textAlign: TextAlign.center,
     );

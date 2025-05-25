@@ -1,10 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:image_picker/image_picker.dart';
 import 'package:rent_a_car/widgets/buttons/custom_button.dart';
 import 'package:rent_a_car/widgets/input_text_field.dart';
+import 'package:rent_a_car/widgets/loading_screen.dart';
 import 'dart:io';
 
 import '../../services/auth_service.dart';
@@ -22,18 +20,18 @@ class _RegisterStepOneState extends State<RegisterStepOne> {
   final _formKey = GlobalKey<FormState>();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
-  final TextEditingController _confirmPasswordController = TextEditingController();
+  final TextEditingController _confirmPasswordController =
+      TextEditingController();
 
   void _nextStep() {
     if (_formKey.currentState!.validate()) {
       Navigator.push(
         context,
         MaterialPageRoute(
-          builder: (context) =>
-              RegisterStepTwo(
-                email: _emailController.text,
-                password: _passwordController.text,
-              ),
+          builder: (context) => RegisterStepTwo(
+            email: _emailController.text,
+            password: _passwordController.text,
+          ),
         ),
       );
     }
@@ -58,7 +56,7 @@ class _RegisterStepOneState extends State<RegisterStepOne> {
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 Image.asset(
-                  "assets/images/logo.png",
+                  "assets/images/logo.webp",
                   height: 100,
                   width: 100,
                 ),
@@ -75,7 +73,7 @@ class _RegisterStepOneState extends State<RegisterStepOne> {
                   validator: (value) {
                     if (value != null && value.isNotEmpty) {
                       final bool emailValid = RegExp(
-                          r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+")
+                              r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+")
                           .hasMatch(value);
                       if (emailValid) return null;
                       return "Please enter a valid email address@";
@@ -93,7 +91,7 @@ class _RegisterStepOneState extends State<RegisterStepOne> {
                     //todo make this pretty in provider and for each requirement color it green when it is satisfied
                     if (value != null && value.isNotEmpty) {
                       final bool passwordValid = RegExp(
-                          r'^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[!@#\$&*~]).{8,}$')
+                              r'^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[!@#\$&*~]).{8,}$')
                           .hasMatch(value);
                       if (passwordValid) return null;
                       return 'Password is weak. Read the specifications below:';
@@ -101,8 +99,14 @@ class _RegisterStepOneState extends State<RegisterStepOne> {
                     return "Please enter a password";
                   },
                 ),
-                const NormalText(text: "Password must be at least 8 characters, contain at least 1 uppercase and 1 lowercase letter, a number and a special character.", size: 12,),
-                const SizedBox(height: 16,),
+                const NormalText(
+                  text:
+                      "Password must be at least 8 characters, contain at least 1 uppercase and 1 lowercase letter, a number and a special character.",
+                  size: 12,
+                ),
+                const SizedBox(
+                  height: 16,
+                ),
                 CustomTextField(
                   controller: _confirmPasswordController,
                   isPassword: true,
@@ -150,14 +154,13 @@ class _RegisterStepTwoState extends State<RegisterStepTwo> {
   final TextEditingController _usernameController = TextEditingController();
   File? image;
 
-
   Future<void> _register(String email, String password, String username,
       File? profilePicture) async {
     if (_formKey.currentState?.validate() ?? false) {
       _formKey.currentState?.save();
 
-      String? errorMessage =
-      await _authService.registerUser(email: email,
+      String? errorMessage = await _authService.registerUser(
+          email: email,
           password: password,
           username: username,
           profilePicture: image);
@@ -169,15 +172,17 @@ class _RegisterStepTwoState extends State<RegisterStepTwo> {
         toastLength: Toast.LENGTH_SHORT,
         gravity: ToastGravity.BOTTOM,
         backgroundColor:
-        errorMessage == null ? Colors.green.shade300 : Colors.red.shade300,
+            errorMessage == null ? Colors.green.shade300 : Colors.red.shade300,
         textColor:
-        errorMessage == null ? Colors.green.shade900 : Colors.red.shade900,
+            errorMessage == null ? Colors.green.shade900 : Colors.red.shade900,
         fontSize: 16.0,
       );
 
-      if (errorMessage == null && mounted) {
-        Navigator.pushReplacementNamed(context, '/login');
+      if (errorMessage != null) {
+        throw Exception(errorMessage);
       }
+    } else {
+      throw Exception("Form validation failed.");
     }
     //todo show errors on screen
   }
@@ -200,7 +205,7 @@ class _RegisterStepTwoState extends State<RegisterStepTwo> {
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 Image.asset(
-                  "assets/images/logo.png",
+                  "assets/images/logo.webp",
                   height: 100,
                   width: 100,
                 ),
@@ -209,7 +214,7 @@ class _RegisterStepTwoState extends State<RegisterStepTwo> {
                 const SizedBox(height: 8),
                 const NormalText(
                     text:
-                    "Enter your username, pick your profile picture and you are done!"),
+                        "Enter your username, pick your profile picture and you are done!"),
                 const SizedBox(height: 32),
                 CustomTextField(
                   hintText: "Username",
@@ -229,12 +234,28 @@ class _RegisterStepTwoState extends State<RegisterStepTwo> {
                   });
                 }),
                 const SizedBox(height: 10),
-                const NormalText(text: "*A picture is necessary for identification when renting a car. You can skip this step now, but you must upload it later in order to rent a car.", size: 14,),
-                const SizedBox(height: 20),
-                CustomButton(
-                    onPressed: () => _register(widget.email, widget.password, _usernameController.text, image),
-                    text: "Complete Registration"
+                const NormalText(
+                  text:
+                      "*A picture is necessary for identification when renting a car. You can skip this step now, but you must upload it later in order to rent a car.",
+                  size: 14,
                 ),
+                const SizedBox(height: 20),
+                //todo circular indicator on white screen while waiting
+                CustomButton(
+                    onPressed: () {
+                      Navigator.of(context).push(MaterialPageRoute(
+                          builder: (context) => LoadingScreen(
+                              loadingTask: () => _register(
+                                  widget.email,
+                                  widget.password,
+                                  _usernameController.text,
+                                  image
+                              ),
+                              routeName: '/login'
+                          ),
+                      ));
+                    },
+                    text: "Complete Registration"),
               ],
             ),
           ),

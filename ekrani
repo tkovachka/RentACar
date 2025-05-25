@@ -10,6 +10,7 @@ Screens:
 /checkout
 /bookingConfirmed
 /myBookings (user's bookings)
+/addCar ? (ekstra funkcionalnost ako korisnik saka da dodade svoja kola na oglas)
 
 Model:
 Car:

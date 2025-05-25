@@ -1,5 +1,4 @@
 import 'dart:io';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
@@ -13,6 +12,36 @@ class FirestoreService {
 
   DocumentReference get currentUserDoc => users.doc(_auth.currentUser?.uid);
 
+  Future<String?> getProfilePictureUrl() async {
+    try {
+      final snapshot = await currentUserDoc.get();
+
+      if (!snapshot.exists) return null;
+
+      final data = snapshot.data() as Map<String, dynamic>?;
+      return data?['profilePicture'] as String?;
+    } catch (_) {
+      return '';
+    }
+  }
+
+  Future<String?> getUsername() async {
+    try {
+      DocumentSnapshot snapshot = await FirebaseFirestore.instance
+          .collection('app_users')
+          .doc(FirebaseAuth.instance.currentUser?.uid)
+          .get();
+
+      if (snapshot.exists) {
+        return snapshot['username'];
+      } else {
+        return null;
+      }
+    } catch (e) {
+      return null;
+    }
+  }
+
   Future<String?> updateUsername(String newUsername) async {
     try {
       await currentUserDoc.update({'username': newUsername});
@@ -22,11 +51,31 @@ class FirestoreService {
     }
   }
 
-  Future<String?> updateProfilePicture(File profilePictureFile) async {
+
+  Future<String?> updateProfilePicture(File? profilePictureFile) async {
     try {
+      String? oldUrl = await getProfilePictureUrl();
+
+      //delete old picture from storage
+      if (oldUrl != null && oldUrl.isNotEmpty) {
+        try {
+          final oldRef = FirebaseStorage.instance.refFromURL(oldUrl);
+          await oldRef.delete();
+        } catch (e) {
+          print('Warning: Failed to delete old profile picture: $e');
+          return 'FAILED TO DELETE OLD PICTURE';
+        }
+      }
+
+      //if no file sent, just delete the picture
+      if(profilePictureFile == null) {
+        await currentUserDoc.update(({'profilePicture': FieldValue.delete()}));
+        return null;
+      }
+
       String fileName = basename(profilePictureFile.path);
       Reference storageRef =
-          FirebaseStorage.instance.ref().child('profile_pictures/$fileName');
+        FirebaseStorage.instance.ref().child('profile_pictures/$fileName');
       UploadTask uploadTask = storageRef.putFile(profilePictureFile);
       TaskSnapshot snapshot = await uploadTask;
 
@@ -35,7 +84,7 @@ class FirestoreService {
       await currentUserDoc.update({'profilePicture': downloadUrl});
 
       return null; //Success
-    } catch (e) {
+      } catch (e) {
       return 'Failed to update profile picture: ${e.toString()}';
     }
   }

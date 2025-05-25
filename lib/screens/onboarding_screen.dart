@@ -20,18 +20,18 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
       'title': "Locate the Car",
       'description':
           "Your car is at your fingertips. Open the app & find the perfect car according to your needs.",
-      'imagePath': "assets/images/on_boarding_1.png",
+      'imagePath': "assets/images/on_boarding_1.webp",
     },
     {
       'title': "Choose the Date",
       'description':
           "Available dates are shown directly in your calendar. Choose the date as easy as 1-2-3.",
-      'imagePath': "assets/images/on_boarding_2.png",
+      'imagePath': "assets/images/on_boarding_2.webp",
     },
     {
       'title': "Enjoy Your Ride",
       'description': "Explore and enjoy your trip with ease.",
-      'imagePath': "assets/images/on_boarding_3.png",
+      'imagePath': "assets/images/on_boarding_3.webp",
     },
   ];
 

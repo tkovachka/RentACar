@@ -13,13 +13,13 @@ class WelcomeScreen extends StatelessWidget {
           children: [
             Positioned.fill(
               child: Image.asset(
-                'assets/images/logo.png',
+                'assets/images/logo.webp',
                 fit: BoxFit.cover,
               ),
             ),
             Positioned.fill(
               child: Image.asset(
-                'assets/images/welcome-white.png',
+                'assets/images/welcome-white.webp',
                 fit: BoxFit.contain,
               ),
             ),

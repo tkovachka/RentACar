@@ -39,10 +39,17 @@ dependencies:
   table_calendar: ^3.2.0
   flutter_datetime_picker: ^1.5.1
   firebase_core: ^3.12.1
-  firebase_auth: ^5.5.1
+  firebase_auth: ^5.5.4
   firebase_storage: ^12.4.4
   cloud_firestore: ^5.6.5
   image_picker: ^1.1.2
+  path: ^1.9.0
+  image: ^4.5.3
+  flutter_image_compress: ^2.4.0
+  path_provider: ^2.1.5
+  loading_indicator: ^3.1.1
+  shared_preferences: ^2.5.3
+  cached_network_image: ^3.4.1
 
 dev_dependencies:
   flutter_test:
@@ -61,12 +68,11 @@ dev_dependencies:
 # The following section is specific to Flutter packages.
 flutter:
   assets:
-    - assets/images/logo.png
-    - assets/images/on_boarding_1.png
-    - assets/images/on_boarding_2.png
-    - assets/images/on_boarding_3.png
-    - assets/images/welcome.png
-    - assets/images/welcome-white.png
+    - assets/images/logo.webp
+    - assets/images/on_boarding_1.webp
+    - assets/images/on_boarding_2.webp
+    - assets/images/on_boarding_3.webp
+    - assets/images/welcome-white.webp
 
   # The following line ensures that the Material Icons font is
   # included with your application, so that you can use the icons in

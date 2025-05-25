@@ -7,6 +7,8 @@ import 'package:rent_a_car/widgets/divider.dart';
 import 'package:rent_a_car/widgets/input_text_field.dart';
 import 'package:rent_a_car/widgets/text/custom_text.dart';
 
+import '../../widgets/loading_screen.dart';
+
 class LoginScreen extends StatefulWidget {
   const LoginScreen({Key? key}) : super(key: key);
 
@@ -21,7 +23,7 @@ class _LoginScreenState extends State<LoginScreen> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
 
-  void _login(String email, String password) async {
+  Future<void> _login(String email, String password) async {
     if (_formKey.currentState?.validate() ?? false) {
       _formKey.currentState?.save();
 
@@ -41,9 +43,11 @@ class _LoginScreenState extends State<LoginScreen> {
         fontSize: 16.0,
       );
 
-      if (errorMessage == null && mounted) {
-        Navigator.pushReplacementNamed(context, '/home');
+      if (errorMessage != null) {
+        throw Exception(errorMessage);
       }
+    } else {
+      throw Exception("Form validation failed.");
     }
     //todo show errors on screen
   }
@@ -68,7 +72,7 @@ class _LoginScreenState extends State<LoginScreen> {
               children: [
                 //todo get image from firebase and use as network image
                 Image.asset(
-                  "assets/images/logo.png",
+                  "assets/images/logo.webp",
                   height: 100,
                   width: 100,
                 ),
@@ -116,11 +120,16 @@ class _LoginScreenState extends State<LoginScreen> {
                 ),
                 const SizedBox(height: 24),
                 CustomButton(
-                  //todo make this bigger
-                  text: "Log In",
-                  onPressed: () =>
-                      _login(_emailController.text, _passwordController.text),
-                ),
+                    text: "Log In",
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                      Navigator.of(context).push(MaterialPageRoute(
+                        builder: (context) => LoadingScreen(
+                            loadingTask: () => _login(_emailController.text,
+                                _passwordController.text),
+                            routeName: '/home'),
+                      ));
+                    }),
                 const SizedBox(height: 16),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
