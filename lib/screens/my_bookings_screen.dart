@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 
-import '../models/car.dart';
-import '../widgets/car_card.dart';
+import 'package:rent_a_car/models/car.dart';
+import 'package:rent_a_car/widgets/cards/car_card.dart';
+
+//todo: Get user's bookings from firestore
 
 class MyBookingsScreen extends StatelessWidget {
   const MyBookingsScreen({super.key});
@@ -27,9 +29,9 @@ class MyBookingsScreen extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 16),
-            Expanded(
-              child: CarCard(car: car),
-            ),
+            // Expanded(
+            //   child: CarCard(car: )),
+            // ),
           ],
         ),
       ),
@@ -64,17 +66,3 @@ class MyBookingsScreen extends StatelessWidget {
     );
   }
 }
-
-final Car car = Car(
-  id: '1',
-  brand: 'Toyota',
-  model: 'Corolla',
-  type: 'Economy',
-  capacity: 4,
-  imagePath: 'assets/images/car.png',
-  location: 'Skopje City Center',
-  characteristics: ['Fuel-efficient', 'Compact size'],
-  unavailableDates: [],
-  pricePerDay: 400,
-  rating: 4.5,
-);

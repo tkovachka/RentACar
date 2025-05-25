@@ -1,7 +1,17 @@
 import 'package:flutter/material.dart';
+import 'package:rent_a_car/services/auth_service.dart';
 
 class ForgotPasswordScreen extends StatelessWidget {
-  const ForgotPasswordScreen({Key? key}) : super(key: key);
+  ForgotPasswordScreen({super.key});
+
+  final _authService = AuthService();
+  final _emailController = TextEditingController();
+
+  void _sendResetEmail(BuildContext context) async {
+    String? errorMessage = await _authService.sendPasswordResetEmail(_emailController.text);
+    //todo fix this message
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(errorMessage ?? 'Check your email for password reset link.')));
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -58,9 +68,7 @@ class ForgotPasswordScreen extends StatelessWidget {
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
-                  onPressed: () {
-                    Navigator.pushReplacementNamed(context, '/passwordChanged');
-                  },
+                  onPressed: () => _sendResetEmail(context),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.purple.shade300,
                     padding: const EdgeInsets.symmetric(vertical: 16),

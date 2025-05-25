@@ -1,9 +1,14 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:proekt/widgets/car_card.dart';
-import 'package:proekt/widgets/filter_button.dart';
-
-import '../models/car.dart';
+import 'package:rent_a_car/widgets/cards/car_card.dart';
+import 'package:rent_a_car/widgets/buttons/filter_button.dart';
+import 'package:rent_a_car/services/car_service.dart';
+import 'package:rent_a_car/services/firestore_service.dart';
+import 'package:rent_a_car/services/images_service.dart';
+import 'package:rent_a_car/models/car.dart';
+import 'package:rent_a_car/widgets/text/custom_text.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 
 class HomeScreen extends StatefulWidget {
   @override
@@ -11,7 +16,41 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  Set<String> selectedFilters = Set<String>();
+  final CarService _carService = CarService();
+  final FirestoreService _firestoreService = FirestoreService();
+  List<Car> _cars = [];
+  bool _isLoading = true;
+  Set<String> selectedFilters = {};
+  String? userProfilePicture;
+
+  @override
+  void initState() {
+    super.initState();
+    _initializeData();
+  }
+
+  Future<void> _initializeData() async {
+    String? cachedUrl = await ImageService.loadImageUrlFromCache('user_profile_picture_url');
+    String? url;
+
+    if (cachedUrl != null && cachedUrl.isNotEmpty) {
+      url = cachedUrl;
+    } else {
+      url = await _firestoreService.getProfilePictureUrl();
+
+      if (url != null && url.isNotEmpty) {
+        await ImageService.saveImageToCache(url, 'user_profile_picture_url');
+      }
+
+      final cars = await _carService.getTopCars(limit: 6);
+
+      setState(() {
+        userProfilePicture = url;
+        _cars = cars;
+        _isLoading = false;
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -38,6 +77,7 @@ class _HomeScreenState extends State<HomeScreen> {
                             style: TextStyle(color: Colors.grey, fontSize: 12),
                           ),
                           Text(
+                            //todo (not important) get real location
                             'Skopje, Macedonia',
                             style: TextStyle(
                                 color: Colors.black,
@@ -48,13 +88,23 @@ class _HomeScreenState extends State<HomeScreen> {
                       ),
                     ],
                   ),
-                  ClipOval(
-                    child: Image.asset(
-                      'assets/images/profile_picture.jpg',
-                      width: 40,
-                      height: 40,
-                      fit: BoxFit.contain,
+                  GestureDetector(
+                    child: ClipOval(
+                      child: userProfilePicture != null
+                          ? CachedNetworkImage(
+                            imageUrl: userProfilePicture!,
+                            width: 40,
+                            height: 40,
+                            fit: BoxFit.cover,
+                          )
+                          : Container(
+                            width: 40,
+                            height: 40,
+                            color: Colors.grey[300],
+                            child: const Icon(Icons.person, color: Colors.white),
+                          ),
                     ),
+                    onTap: () => Navigator.pushNamed(context, '/myAccount'),
                   ),
                 ],
               ),
@@ -151,34 +201,26 @@ class _HomeScreenState extends State<HomeScreen> {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  const Text(
-                    'All Cars',
-                    style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.black),
-                  ),
+                  const NormalText(text: "Browse Cars", bold: true, size: 18,),
                   GestureDetector(
                     onTap: () {
-                      Navigator.popAndPushNamed(context, '/allCars');
+                      Navigator.pushNamed(context, '/allCars');
                     },
-                    child: const Text(
-                      'View All',
-                      style: TextStyle(
-                          fontSize: 16,
-                          color: Colors.purple,
-                          fontWeight: FontWeight.normal),
-                    ),
+                    child: const LinkText(text: "View All", size: 16,)
                   ),
                 ],
               ),
             ),
             const SizedBox(height: 8),
             Expanded(
-              child: ListView(
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                children: mockCars.map((car) => CarCard(car: car)).toList(),
-              ),
+              child: _isLoading ? const Center(child: CircularProgressIndicator())
+                : ListView.builder(
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  itemCount: _cars.length,
+                  itemBuilder: (context, index){
+                    return CarCard(car: _cars[index]);
+                  },
+                ),
             ),
           ],
         ),
@@ -188,11 +230,11 @@ class _HomeScreenState extends State<HomeScreen> {
         // Adjust based on the current screen
         onTap: (index) {
           if (index == 0) {
-            Navigator.popAndPushNamed(context, '/home');
+            Navigator.pushNamed(context, '/home');
           } else if (index == 1) {
-            Navigator.popAndPushNamed(context, '/myBookings');
+            Navigator.pushNamed(context, '/myBookings');
           } else if (index == 2) {
-            Navigator.popAndPushNamed(context, '/myAccount');
+            Navigator.pushNamed(context, '/myAccount');
           }
         },
         items: const [
@@ -215,48 +257,6 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 }
-
-final List<Car> mockCars = [
-  Car(
-    id: '1',
-    brand: 'Toyota',
-    model: 'Corolla',
-    type: 'Economy',
-    capacity: 4,
-    imagePath: 'assets/images/car.png',
-    location: 'Skopje City Center',
-    characteristics: ['Fuel-efficient', 'Compact size'],
-    unavailableDates: [],
-    pricePerDay: 400,
-    rating: 4.5,
-  ),
-  Car(
-    id: '2',
-    brand: 'Ford',
-    model: 'Escape',
-    type: 'SUV',
-    capacity: 6,
-    imagePath: 'assets/images/car.png',
-    location: 'Skopje East',
-    characteristics: ['Spacious', 'Four-wheel drive'],
-    unavailableDates: [],
-    pricePerDay: 200,
-    rating: 4.3,
-  ),
-  Car(
-    id: '3',
-    brand: 'Mercedes-Benz',
-    model: 'S-Class',
-    type: 'Luxury',
-    capacity: 4,
-    imagePath: 'assets/images/car.png',
-    location: 'Skopje West',
-    characteristics: ['Luxury interior', 'Advanced safety features'],
-    unavailableDates: [],
-    pricePerDay: 350,
-    rating: 4.9,
-  ),
-];
 
 final List<Map<String, dynamic>> mockFilters = [
   {'label': 'BMW', 'icon': Icons.directions_car},

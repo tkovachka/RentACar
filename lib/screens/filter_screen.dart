@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../widgets/text_filter_button.dart';
+import '../widgets/buttons/text_filter_button.dart';
 
 class FilterScreen extends StatefulWidget {
   @override

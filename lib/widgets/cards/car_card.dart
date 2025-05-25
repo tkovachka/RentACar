@@ -1,12 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:proekt/models/car.dart';
+import 'package:rent_a_car/models/car.dart';
 
-import '../screens/car_details_screen.dart'; // Ensure this is the path to your Car model file.
+import 'package:rent_a_car/screens/car_details_screen.dart';
 
 class CarCard extends StatefulWidget {
   final Car car;
 
-  // Constructor
   const CarCard({super.key, required this.car});
 
   @override
@@ -38,8 +37,8 @@ class _CarCardState extends State<CarCard> {
                   // Car image
                   ClipRRect(
                     borderRadius: BorderRadius.circular(8),
-                    child: Image.asset(
-                      widget.car.imagePath, // Assuming 'imageUrl' is a field in your Car model
+                    child: Image.network(
+                      widget.car.imageUrl,
                       width: double.infinity,
                       height: 200,
                       fit: BoxFit.contain,
@@ -86,7 +85,7 @@ class _CarCardState extends State<CarCard> {
                       ),
                       const SizedBox(width: 4),
                       Text(
-                        '${widget.car.rating}',
+                        widget.car.type,
                         style: const TextStyle(
                           color: Colors.black,
                           fontWeight: FontWeight.bold,
@@ -102,7 +101,7 @@ class _CarCardState extends State<CarCard> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    'Capacity: ${widget.car.capacity} people',
+                    'Capacity: ${widget.car.seats} people',
                     style: const TextStyle(color: Colors.grey),
                   ),
                   Text(

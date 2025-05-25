@@ -1,95 +1,151 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
+import 'package:rent_a_car/services/auth_service.dart';
+import 'package:rent_a_car/services/firestore_service.dart';
+import 'package:rent_a_car/widgets/clickable_text_field.dart';
+import 'package:rent_a_car/widgets/custom_image_picker.dart';
+import 'package:rent_a_car/widgets/text/custom_text.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:rent_a_car/services/images_service.dart';
 
-import '../../widgets/filter_button.dart';
+//todo think about attaching drivers licence and registration and anything else?
+//todo add name and surname in model and registration page
+class MyAccountScreen extends StatefulWidget {
+  MyAccountScreen({super.key});
 
-class MyAccountScreen extends StatelessWidget {
+  @override
+  _MyAccountScreenState createState() => _MyAccountScreenState();
+}
+
+class _MyAccountScreenState extends State<MyAccountScreen> {
+  final _firestore = FirestoreService();
+  final _auth = AuthService();
+  File? image;
+  String? profilePictureUrl;
+  bool isLoading = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _initializeProfilePicture();
+  }
+
+  void _initializeProfilePicture() {
+    _loadProfilePicture();
+  }
+
+  Future<void> _loadProfilePicture() async {
+    setState(() => isLoading = true);
+
+    String? url =
+        await ImageService.loadImageUrlFromCache('user_profile_picture_url');
+
+    if (url == null || url.isEmpty) {
+      url = await _firestore.getProfilePictureUrl();
+      if (url != null && url.isNotEmpty) {
+        await ImageService.saveImageToCache(url, 'user_profile_picture_url');
+      }
+    }
+
+    if (mounted) {
+      setState(() {
+        profilePictureUrl = url;
+        isLoading = false;
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Colors.white,
-        elevation: 0,
-        automaticallyImplyLeading: false,
-        title: const Row(
-          children: [
-            CircleAvatar(
-              backgroundImage: AssetImage('assets/images/profile_picture.jpg'),
-              radius: 20,
-            ),
-            SizedBox(width: 16),
-            Text(
-              'Rent A Car',
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-                color: Colors.black,
-              ),
-            ),
-          ],
-        ),
-        actions: [
-          IconButton(
-            onPressed: () {},
-            icon: const Icon(Icons.edit, color: Colors.black),
-          ),
-        ],
-      ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Filter Buttons
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: <Widget>[
+            const SizedBox(
+              height: 16,
+            ),
+            Align(
+              alignment: Alignment.topRight,
+              child: IconButton(
+                icon: const Icon(Icons.logout, color: Colors.purple),
+                onPressed: () async {
+                  await _auth.logout();
+                  Navigator.pushReplacementNamed(context, '/welcome');
+                },
+              ),
+            ),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                FilterButton(
-                  label: 'License',
-                  icon: Icons.card_membership,
-                  isSelected: true,
-                  onTap: () {}, // Non-clickable for now
-                ),
-                FilterButton(
-                  label: 'Password',
-                  icon: Icons.lock,
-                  isSelected: true,
-                  onTap: () {}, // Non-clickable for now
-                ),
-                FilterButton(
-                  label: 'Contract',
-                  icon: Icons.file_copy,
-                  isSelected: true,
-                  onTap: () {}, // Non-clickable for now
-                ),
+                const SizedBox(height: 32),
+                CustomImagePicker(
+                    profilePictureUrl: profilePictureUrl,
+                    isLoading: isLoading,
+                    onImageSelected: (File? selectedImage) async {
+                      setState(() {
+                        isLoading = true;
+                      });
+
+                      if (selectedImage == null) {
+                        //user wants to delete image
+                        setState(() {
+                          image = null;
+                          profilePictureUrl = "";
+                        });
+                        await _firestore.updateProfilePicture(null);
+                      } else {
+                        setState(() {
+                          image = selectedImage;
+                        });
+                        await _firestore.updateProfilePicture(selectedImage);
+                      }
+                      String? newUrl = await _firestore.getProfilePictureUrl();
+
+                      if (newUrl != null && newUrl.isNotEmpty) {
+                        await ImageService.saveImageToCache(
+                            newUrl, 'user_profile_picture_url');
+
+                        if (mounted) {
+                          setState(() {
+                            profilePictureUrl = newUrl;
+                            isLoading = false;
+                          });
+                        }
+                      } else {
+                        if (mounted) {
+                          setState(() {
+                            profilePictureUrl = "";
+                            isLoading = false;
+                          });
+                        }
+                      }
+                    }),
+                const SizedBox(height: 16),
               ],
             ),
-            const SizedBox(height: 30),
-            // Options List
-            _buildOptionItem(context, Icons.person, 'My Profile'),
-            _buildOptionItem(context, Icons.directions_car, 'My Bookings'),
-            _buildOptionItem(context, Icons.settings, 'Settings'),
+            const SizedBox(height: 16),
+            CustomTextField(
+                label: "Account Information",
+                icon: Icons.person,
+                onTap: () {} //todo edit username form here
+                ),
+            const SizedBox(height: 8),
+            CustomTextField(
+                label: "Privacy and Security",
+                icon: Icons.lock,
+                onTap:
+                    () {} //todo handle changing password and email validation here
+                ),
             const Spacer(),
-            // Logout Option
-            Row(
-              children: [
-                const Icon(Icons.logout, color: Colors.purple),
-                ElevatedButton(
-                  onPressed: () => Navigator.popAndPushNamed(context, '/login'),
-                    child: const Text(
-                      'Logout',
-                      style: TextStyle(
-                        color: Colors.purple,
-                        fontSize: 14,
-                      ),
-                    ),
-                )
-              ],
-            ),
           ],
         ),
       ),
       bottomNavigationBar: BottomNavigationBar(
-        currentIndex: 2, // Account is selected
+        currentIndex: 2,
+        // Adjust based on the current screen
         onTap: (index) {
           if (index == 0) {
             Navigator.popAndPushNamed(context, '/home');
@@ -115,25 +171,6 @@ class MyAccountScreen extends StatelessWidget {
         ],
         selectedItemColor: Colors.purple,
         unselectedItemColor: Colors.black,
-      ),
-    );
-  }
-
-  Widget _buildOptionItem(BuildContext context, IconData icon, String title) {
-    return Container(
-      margin: const EdgeInsets.symmetric(vertical: 8),
-      decoration: BoxDecoration(
-        border: Border.all(color: Colors.grey.shade300),
-        borderRadius: BorderRadius.circular(8),
-      ),
-      child: ListTile(
-        leading: Icon(icon, color: Colors.black),
-        title: Text(
-          title,
-          style: const TextStyle(fontSize: 16, color: Colors.black),
-        ),
-        trailing: const Icon(Icons.chevron_right, color: Colors.grey),
-        onTap: () {},
       ),
     );
   }
