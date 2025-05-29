@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:rent_a_car/models/car.dart';
+import 'package:rent_a_car/widgets/buttons/custom_button.dart';
 import 'package:rent_a_car/widgets/buttons/filter_button.dart';
 import 'package:rent_a_car/screens/checkout/select_date_screen.dart';
 import 'package:rent_a_car/widgets/text/custom_text.dart';
@@ -91,34 +92,31 @@ class CarDetailsScreen extends StatelessWidget {
               const SizedBox(height: 16),
 
               Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16),
+                padding: const EdgeInsets.all(16),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Column(
                       children: [
                         const NormalText(text: "Price: ",size: 16,),
-                        LinkText(text: "\$${car.pricePerDay}", size: 18,),
-                        const NormalText(text: "/day",size: 14,)
+                        Row(
+                          children: [
+                            LinkText(text: "\$${car.pricePerDay}", size: 18,),
+                            const NormalText(text: "/day",size: 14,),
+                          ],
+                        )
                       ],
                     ),
-                    ElevatedButton(
-                      onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => SelectDateScreen(car: car),
-                          ),
-                        );
-                      },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.purple,
-                        minimumSize: const Size(150, 50),
-                      ),
-                      child: const Text(
-                        'Book Now',
-                        style: TextStyle(color: Colors.white),
-                      ),
+                    CustomButton(
+                        text: 'Book Now',
+                        onPressed: (){
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => SelectDateScreen(car: car),
+                            ),
+                          );
+                        }
                     ),
                   ],
                 ),
