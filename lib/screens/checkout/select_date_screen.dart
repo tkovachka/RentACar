@@ -238,6 +238,12 @@ class _SelectDateScreenState extends State<SelectDateScreen> {
 
                               await _bookingsService.addBooking(booking);
 
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                    content: Text(
+                                        "Booking saved successfully")),
+                              );
+
                               Navigator.pushNamed(context, '/checkout');
                             },
                           ),

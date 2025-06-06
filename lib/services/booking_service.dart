@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:rent_a_car/models/booking.dart';
+import 'package:rent_a_car/services/car_service.dart';
 
 class BookingsService {
   final FirebaseFirestore _db = FirebaseFirestore.instance;
@@ -72,22 +73,33 @@ class BookingsService {
     return blockedDates;
   }
 
-  Future<List<Booking>> getBookingsForUser() async {
+  Future<List<Map<String, dynamic>>> getUserBookingsWithCars() async {
     final currentUser = FirebaseAuth.instance.currentUser;
-    if (currentUser == null) {
-      throw Exception('No user is currently signed in');
-    }
+    if (currentUser == null) throw Exception('No user is currently signed in');
 
     final snapshot = await _db
         .collection(collectionPath)
         .where('userId', isEqualTo: currentUser.uid)
-        .orderBy('startDate', descending: false)
+        .orderBy('startDate')
         .get();
 
-    return snapshot.docs
-        .map((doc) => Booking.fromMap(doc.data()))
-        .toList();
+    final bookings = snapshot.docs.map((doc) => Booking.fromMap(doc.data())).toList();
+    final carService = CarService();
+
+    final List<Map<String, dynamic>> combined = [];
+
+    for (final booking in bookings) {
+      final car = await carService.getCarById(booking.carId);
+      if (car != null) {
+        combined.add({'booking': booking, 'car': car});
+      }
+    }
+
+    return combined;
   }
 
+  Future<void> removeBooking(String bookingId) async {
+    await _db.collection(collectionPath).doc(bookingId).delete();
+  }
 
 }

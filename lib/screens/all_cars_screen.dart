@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:rent_a_car/data/app_data_cache.dart';
 import 'package:rent_a_car/widgets/cards/car_card.dart';
 import 'package:rent_a_car/models/car.dart';
 import 'package:rent_a_car/services/car_service.dart';
@@ -20,9 +21,17 @@ class _AllCarsScreenState extends State<AllCarsScreen> {
   }
 
   Future<void> _loadCars() async {
-    final fetchedCars = await _carService.getAllCars();
+    List<Car> cars;
+
+    if(AppDataCache().hasCachedCars){
+      cars = AppDataCache().cars;
+    } else {
+      cars = await _carService.getAllCars();
+      AppDataCache().cars = cars;
+    }
+
     setState(() {
-      _cars = fetchedCars;
+      _cars = cars;
       _isLoading = false;
     });
   }

@@ -17,12 +17,18 @@ import 'package:rent_a_car/screens/search_by_date_screen.dart';
 import 'package:rent_a_car/screens/welcome_screen.dart';
 import 'package:rent_a_car/screens/filter_screen.dart';
 import 'package:rent_a_car/screens/all_cars_screen.dart';
+import 'package:rent_a_car/data/app_data_cache.dart';
+import 'package:rent_a_car/services/car_service.dart';
+import 'package:rent_a_car/services/firestore_service.dart';
+import 'package:rent_a_car/services/images_service.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
+
   runApp(const MyApp());
 }
 
