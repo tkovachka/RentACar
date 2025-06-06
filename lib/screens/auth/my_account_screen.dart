@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:rent_a_car/data/app_data_cache.dart';
 import 'package:rent_a_car/services/auth_service.dart';
 import 'package:rent_a_car/services/firestore_service.dart';
 import 'package:rent_a_car/widgets/clickable_text_field.dart';
@@ -23,7 +24,7 @@ class _MyAccountScreenState extends State<MyAccountScreen> {
   final _auth = AuthService();
   File? image;
   String? profilePictureUrl;
-  bool isLoading = false;
+  bool isLoading = true;
 
   @override
   void initState() {
@@ -36,16 +37,21 @@ class _MyAccountScreenState extends State<MyAccountScreen> {
   }
 
   Future<void> _loadProfilePicture() async {
-    setState(() => isLoading = true);
-
-    String? url =
+    String? url;
+    if(AppDataCache().hasUrl){
+      url = AppDataCache().url;
+    } else {
+      url =
         await ImageService.loadImageUrlFromCache('user_profile_picture_url');
 
-    if (url == null || url.isEmpty) {
-      url = await _firestore.getProfilePictureUrl();
-      if (url != null && url.isNotEmpty) {
-        await ImageService.saveImageToCache(url, 'user_profile_picture_url');
+      if (url == null || url.isEmpty) {
+        url = await _firestore.getProfilePictureUrl();
+
+        if (url != null && url.isNotEmpty) {
+          await ImageService.saveImageToCache(url, 'user_profile_picture_url');
+        }
       }
+      AppDataCache().url = url!;
     }
 
     if (mounted) {

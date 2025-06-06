@@ -23,18 +23,19 @@ exports.fetchAndStoreCars = functions.https.onRequest(async (req, res) => {
       const brand = car.make_model.make.name;
       const model = car.make_model.name;
       const query = `${brand} ${model} car`;
-      const unsplashUrl = `https://api.unsplash.com/search/photos?query=${encodeURIComponent(query)}&client_id=${unsplashAccessKey}&per_page=1`;
+      const unsplashUrl = `https://api.unsplash.com/search/photos?query=${encodeURIComponent(query)}&client_id=${unsplashAccessKey}`;
 
       const unsplashResponse = await fetch(unsplashUrl);
       const unsplashData = await unsplashResponse.json();
 
-      const imageResult = unsplashData.results?.[0];
+      let imageUrl = '';
 
-      if (!imageResult || !imageResult.urls?.small) {
-        console.warn(`No Unsplash image found for query: "${query}"`);
-        imageUrl = '';
+      if(unsplashData.results && unsplashData.results.length > 0){
+        const randomIndex = Math.floor(Math.random() * unsplashData.results.length);
+        const randomImage = unsplashData.results[randomIndex];
+        imageUrl = randomImage.urls?.small || '';
       } else {
-        imageUrl = imageResult.urls.small;
+        console.warn(`No Unsplash image found for query: "${query}"`);
       }
 
       const trimId = car.id;

@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:rent_a_car/data/app_data_cache.dart';
 import 'package:rent_a_car/widgets/cards/car_card.dart';
 import 'package:rent_a_car/widgets/buttons/filter_button.dart';
 import 'package:rent_a_car/services/car_service.dart';
@@ -30,26 +31,38 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Future<void> _initializeData() async {
-    String? cachedUrl = await ImageService.loadImageUrlFromCache('user_profile_picture_url');
+    List<Car> cars;
     String? url;
 
-    if (cachedUrl != null && cachedUrl.isNotEmpty) {
-      url = cachedUrl;
+    if(AppDataCache().hasCachedCars){
+      cars = AppDataCache().cars;
     } else {
-      url = await _firestoreService.getProfilePictureUrl();
-
-      if (url != null && url.isNotEmpty) {
-        await ImageService.saveImageToCache(url, 'user_profile_picture_url');
-      }
-
-      final cars = await _carService.getTopCars(limit: 6);
-
-      setState(() {
-        userProfilePicture = url;
-        _cars = cars;
-        _isLoading = false;
-      });
+      cars = await _carService.getAllCars();
+      AppDataCache().cars = cars;
     }
+
+    if (AppDataCache().hasUrl) {
+      url = AppDataCache().url;
+    } else {
+      String? cachedUrl = await ImageService.loadImageUrlFromCache('user_profile_picture_url');
+      if(cachedUrl != null && cachedUrl.isNotEmpty){
+        url = cachedUrl;
+        AppDataCache().url = url;
+      } else {
+        url = await _firestoreService.getProfilePictureUrl();
+
+        if (url != null && url.isNotEmpty) {
+          AppDataCache().url = url;
+          await ImageService.saveImageToCache(url, 'user_profile_picture_url');
+        }
+      }
+    }
+
+    setState(() {
+      userProfilePicture = url;
+      _cars = cars.take(4).toList();
+      _isLoading = false;
+    });
   }
 
   @override

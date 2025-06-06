@@ -4,6 +4,8 @@ import 'dart:typed_data';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
+import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:path/path.dart' as path;
 import 'package:flutter_image_compress/flutter_image_compress.dart';
@@ -62,7 +64,6 @@ class AuthService {
     }
   }
 
-  //todo maybe implement logging in with username as well?
   Future<String?> loginUser(
       {required String email, required String password}) async {
     try {
@@ -74,6 +75,39 @@ class AuthService {
     } on FirebaseAuthException catch (e) {
       return e.message;
     }
+  }
+
+  Future<UserCredential?> signInWithGoogle() async {
+    final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
+    if (googleUser == null) return null;
+
+    final GoogleSignInAuthentication googleAuth = await googleUser.authentication;
+
+    final credential = GoogleAuthProvider.credential(
+      accessToken: googleAuth.accessToken,
+      idToken: googleAuth.idToken,
+    );
+
+    return await FirebaseAuth.instance.signInWithCredential(credential);
+  }
+
+  Future<void> saveUserData(User user, {String? username, File? image}) async {
+    final userDoc = FirebaseFirestore.instance.collection('app_users').doc(user.uid);
+
+    String? imageUrl;
+    if (image != null) {
+      final ref = FirebaseStorage.instance.ref('profile_pictures/${user.uid}.jpg');
+      await ref.putFile(image);
+      imageUrl = await ref.getDownloadURL();
+    }
+
+    await userDoc.set({
+      'uid': user.uid,
+      'email': user.email,
+      'displayName': user.displayName ?? "",
+      'photoURL': imageUrl ?? user.photoURL,
+      'username': username ?? "",
+    });
   }
 
   Future<String?> logout() async {

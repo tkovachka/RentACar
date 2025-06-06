@@ -19,8 +19,8 @@ class FilterButton extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        width: 80,  // Adjust width to make it a square
-        height: 80,  // Adjust height to make it a square
+        width: 100,  // Adjust width to make it a square
+        height: 100,  // Adjust height to make it a square
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(8), // Rounded corners
